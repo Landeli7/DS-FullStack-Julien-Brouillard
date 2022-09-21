@@ -1,13 +1,9 @@
 package fs.polytech.fsback.entities;
 
+import javax.persistence.*;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Table;
-
-import org.springframework.data.annotation.Id;
+// import javax.persistence.Id;
 
 import lombok.Data;
 import lombok.Builder;
@@ -23,17 +19,21 @@ import lombok.NoArgsConstructor;
 public class RestaurantEntity {
     @Id
     @GeneratedValue
-    int id;
+    private int id;
 
     @Column(name = "nom", columnDefinition = "varchar(255)", nullable = false)
-    String nom;
+    private String nom;
 
     @Column(name = "adresse", columnDefinition = "varchar(255)", nullable = false)
-    String adresse;
+    private String adresse;
 
-    @Column(name = "evalListe", columnDefinition = "varchar(255)", nullable = false)
-    List<EvalEntity> evalListe;
+    @ManyToMany
+    @JoinTable(
+            name = "eval_in_resto",
+            joinColumns = @JoinColumn(name = "id_resto"),
+            inverseJoinColumns = @JoinColumn(name = "id_eval"))
+    private List<EvalEntity> evalListe;
 
     @Column(name = "moyenne", nullable = false)
-    int moyenne;
+    private int moyenne;
 }

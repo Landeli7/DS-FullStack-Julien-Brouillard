@@ -1,11 +1,13 @@
 package fs.polytech.fsback.entities;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-
-import org.springframework.data.annotation.Id;
 
 import lombok.Data;
 import lombok.Builder;
@@ -21,14 +23,17 @@ import lombok.NoArgsConstructor;
 public class EvalEntity {
     @Id
     @GeneratedValue
-    int id;
+    private int id;
 
     @Column(name = "nom", columnDefinition = "varchar(255)", nullable = false)
-    String nom;
+    private String nom;
 
     @Column(name = "commentaire", columnDefinition = "varchar(255)", nullable = false)
-    String commentaire;
+    private String commentaire;
 
     @Column(name = "note")
-    int note;
+    private int note;
+
+    @ManyToMany(mappedBy = "evaluations")
+    private List<RestaurantEntity> evalListe;
 }
