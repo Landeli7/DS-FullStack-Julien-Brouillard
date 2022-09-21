@@ -1,0 +1,250 @@
+swagger: "2.0"
+info:
+  description: "This is a server to manage restaurants. Created by Julien Brouillard"
+  version: "1.0.0"
+  title: "Restos API"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "apiteam@swagger.io"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "localhost:8080"
+basePath: "/v2"
+tags:
+- name: "Restaurants"
+  description: "Gestion des restaurants"
+  externalDocs:
+    description: "Plus"
+    url: "http://swagger.io"
+schemes:
+- "https"
+- "http"
+paths:
+  /evaluations/{evalID}:
+    get:
+      tags:
+      - "Evaluations"
+      summary: "Récupération d'une évaluation"
+      description: "Retourne une évaluation"
+      operationId: "getEvalById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "evalID"
+        in: "path"
+        description: "ID de l'évaluation à retourner"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Eval"
+        "404":
+          description: "Eval not found"
+  /restaurants:
+    get:
+      tags:
+      - "Restaurants"
+      summary: "Récupération des restaurants"
+      description: "Retourne tous les restos"
+      operationId: "getRestos"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Resto"
+        "404":
+          description: "Restos not found"
+      
+      security:
+      - restostore_auth:
+        - "write:restos"
+        - "read:restos"
+    post:
+      tags:
+      - "Restaurants"
+      summary: "Ajouter un nouveau resto"
+      description: ""
+      operationId: "addResto"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Objet restaurant à mettre dans le body"
+        required: true
+        schema:
+          $ref: "#/definitions/Resto"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Resto"
+        "405":
+          description: "Invalid input"
+      security:
+      - restostore_auth:
+        - "write:restos"
+        - "read:restos"
+  /restaurants/{restoID}:
+    get:
+      tags:
+      - "Restaurants"
+      summary: "Récupérer resto via le restoID"
+      description: "Retourne le resto correspondant"
+      operationId: "getRestoById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "restoID"
+        in: "path"
+        description: "ID du resto à retourner"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Resto"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Resto not found"
+      security:
+      - restostore_auth:
+        - "write:restos"
+        - "read:restos"
+    post:
+      tags:
+      - "Restaurants"
+      summary: "Ajouter une évaluation dans un restaurant"
+      description: ""
+      operationId: "postEvalOnResto"
+      consumes:
+      - "application/x-www-form-urlencoded"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "restoID"
+        in: "path"
+        description: "ID du resto auquel ajouter l'évaluation"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "body"
+        in: "body"
+        description: "Evaluation à ajouter au restaurant"
+        required: true
+        schema:
+          $ref: "#/definitions/Eval"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Resto"
+        "405":
+          description: "Invalid input"
+      security:
+      - restostore_auth:
+        - "write:restos"
+        - "read:restos"
+  /restaurants/{restoID}/{EvalID}:
+    delete:
+      tags:
+      - "Restaurants"
+      summary: "Supprimer une évaluation d'un restaurant"
+      description: ""
+      operationId: "deleteEval"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "restoID"
+        in: "path"
+        description: "ID du resto pour lequel supprimer l'évaluation"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "EvalID"
+        in: "path"
+        description: "ID de l'évaluation à supprimer"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Resto"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Resto not found"
+      security:
+      - restostore_auth:
+        - "write:restos"
+        - "read:restos"
+securityDefinitions:
+  restostore_auth:
+    type: "oauth2"
+    authorizationUrl: "http://restostore.swagger.io/oauth/dialog"
+    flow: "implicit"
+    scopes:
+      write:restos: "modify restos"
+      read:restos: "read your restos"
+definitions:
+  Resto:
+    type: "object"
+    required:
+    - "name"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      nom:
+        type: "string"
+        example: "text"
+      adresse:
+        type: "string"
+        example: "text"
+      evalListe:
+        type: "array"
+        xml:
+          name: "evalListe"
+          wrapped: true
+        items:
+          $ref: "#/definitions/Eval"
+      moyenne:
+        type: "integer"
+        format: "int64"
+    xml:
+      name: "Resto"
+  Eval:
+    type: "object"
+    required:
+    - "name"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      nom:
+        type: "string"
+        example: "text"
+      commentaire:
+        type: "string"
+        example: "commentaire"
+      note:
+        type: "integer"
+        format: "int64"
+    xml:
+      name: "Eval"
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"
